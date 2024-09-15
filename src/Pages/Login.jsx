@@ -16,7 +16,7 @@ const Login = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-
+  const [loading, isLoading] = useState(false);
   const { dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -30,7 +30,7 @@ const Login = () => {
 
   const handleClick = async (e) => {
     e.preventDefault();
-
+    isLoading(true);
     dispatch({ type: "LOGIN_START" });
     setError(null); // Reset the error on each login attempt
     try {
@@ -58,6 +58,8 @@ const Login = () => {
     } catch (error) {
       setError("An error occurred while logging in. Please try again later.");
       dispatch({ type: "LOGIN_FAILURE", payload: error.message });
+    } finally {
+      isLoading(false);
     }
   };
 
@@ -91,6 +93,8 @@ const Login = () => {
                       autoComplete="true"
                       id="email"
                       onChange={handleChange}
+                      disabled={loading}
+                      name="email"
                     />
                   </FormGroup>
                   <FormGroup>
@@ -102,9 +106,11 @@ const Login = () => {
                         autoComplete="true"
                         id="password"
                         onChange={handleChange}
+                        disabled={loading}
+                        name="password"
                       />
                       <i
-                        className={`ri-eye-line${showPassword ? "-slash" : ""}`}
+                        className={`ri-eye-${showPassword ? "off-line" : "line"}`}
                         onClick={togglePasswordVisibility}
                       ></i>
                     </div>
@@ -113,8 +119,13 @@ const Login = () => {
                     className="btn secondary__btn auth__btn"
                     type="submit"
                     onClick={handleClick}
+                    disabled={loading}
                   >
-                    Login
+                    { loading ? 
+                    <i class="loader-icon ri-loader-2-line"></i>
+                    : 
+                    "Login"
+                    }
                   </Button>
                 </Form>
                 <p>

@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/Login.css";
+import "../styles/Register.css";
 import registerImg from "../assets/images/register.png";
 import userIcon from "../assets/images/user.png";
 import { AuthContext } from "../context/AuthContext";
@@ -16,6 +17,7 @@ const Register = () => {
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [loading, isLoading] = useState(false);
   const [isEmailValid, setIsEmailValid] = useState(true); // State for email validation
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
@@ -32,7 +34,13 @@ const Register = () => {
 
   const handleClick = async (e) => {
     e.preventDefault();
-
+    isLoading(true);
+    const emailValid = validateEmail(credentials.email);
+    if(!emailValid) {
+      setIsEmailValid(false);
+      isLoading(false);
+      return;
+    }
     dispatch({ type: "REGISTER_START" });
     setError(null); // Reset the error on each registration attempt
     setIsEmailValid(true); // Reset email validation status
@@ -59,6 +67,8 @@ const Register = () => {
     } catch (error) {
       setError("An error occurred while registering. Please try again later.");
       dispatch({ type: "REGISTER_FAILURE", payload: error.message });
+    } finally {
+      isLoading(false);
     }
   };
 
@@ -69,9 +79,7 @@ const Register = () => {
   };
 
   const handleEmailChange = (e) => {
-    const { value } = e.target;
-    setIsEmailValid(validateEmail(value)); // Set email validation status
-    handleChange(e); // Call the regular handleChange function
+    handleChange(e); 
   };
 
   const togglePasswordVisibility = () => {
@@ -103,6 +111,7 @@ const Register = () => {
                       required
                       id="username"
                       onChange={handleChange}
+                      disabled={loading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -112,9 +121,10 @@ const Register = () => {
                       required
                       autoComplete="true"
                       id="email"
-                      onChange={handleEmailChange} // Use handleEmailChange for email input
+                      onChange={handleEmailChange} 
+                      disabled={loading}
                     />
-                    {!isEmailValid && <div className="alert alert-danger">Please enter a valid email address</div>}
+                    {!isEmailValid && <div className="alert-danger error">Please enter a valid email address</div>}
                   </FormGroup>
                   <FormGroup>
                     <div className="password__input">
@@ -125,6 +135,7 @@ const Register = () => {
                         autoComplete="true"
                         id="password"
                         onChange={handleChange}
+                        disabled={loading}
                       />
                       <i
                         className={`ri-eye-line${showPassword ? "-slash" : ""}`}
@@ -136,8 +147,13 @@ const Register = () => {
                     className="btn secondary__btn auth__btn"
                     type="submit"
                     onClick={handleClick}
+                    disabled={loading}
                   >
-                    Create Account
+                    { loading ? 
+                    <i class="loader-icon ri-loader-2-line"></i>
+                    : 
+                    "Create Account"
+                    }
                   </Button>
                 </Form>
                 <p>

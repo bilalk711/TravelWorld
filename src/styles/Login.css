@@ -6,6 +6,19 @@
   text-align: center;
 }
 
+.password__input {
+  position: relative;
+}
+
+.password__input i {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
 .login__img img {
   width: 70%;
   align-items: center;
